@@ -3,6 +3,7 @@ package com.reactive.webflux.controller;
 import com.reactive.webflux.entity.Book;
 import com.reactive.webflux.service.BookService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -11,6 +12,8 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("/books")
 @AllArgsConstructor
+@CrossOrigin(origins = "*")
+@Slf4j
 public class BookController {
 
 
@@ -21,8 +24,9 @@ public class BookController {
     return bookService.create(book);
     }
 //    @GetMapping(value = "/get-all", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    @GetMapping("/get-alln")
+    @GetMapping("/get-all")
     public Flux<Book> getBooks(){
+        log.info("calling gettAll books---");
         return bookService.getAll();
     }
 

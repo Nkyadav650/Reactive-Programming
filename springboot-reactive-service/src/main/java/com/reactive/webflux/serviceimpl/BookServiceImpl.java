@@ -1,6 +1,7 @@
 package com.reactive.webflux.serviceimpl;
 
 import com.reactive.webflux.entity.Book;
+import com.reactive.webflux.exception.IdNotFoundException;
 import com.reactive.webflux.repository.BookRepository;
 import com.reactive.webflux.service.BookService;
 import lombok.AllArgsConstructor;
@@ -20,9 +21,9 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Mono<Book> create(Book book) {
-        System.out.println("current thread before create book: "+Thread.currentThread().getName());
-        return bookRepository.save(book).doOnNext(data->{
-            System.out.println("current thread after create book: "+Thread.currentThread().getName());
+        System.out.println("current thread before create book: " + Thread.currentThread().getName());
+        return bookRepository.save(book).doOnNext(data -> {
+            System.out.println("current thread after create book: " + Thread.currentThread().getName());
         });
     }
 
@@ -33,7 +34,8 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Mono<Book> get(int bookId) {
-        return bookRepository.findById(bookId);
+        return bookRepository.findById(bookId)
+                .switchIfEmpty(Mono.error(new IdNotFoundException("Id " + bookId + " is not available")));
     }
 
     @Override
@@ -51,7 +53,9 @@ public class BookServiceImpl implements BookService {
     @Override
     public Mono<Void> delete(int bookId) {
 //    bookRepository.deleteById(bookId);
-    return bookRepository.findById(bookId).flatMap(bookRepository::delete);
+        return bookRepository.findById(bookId)
+                .onErrorMap(e->new IdNotFoundException("Id "+bookId+" is not available"))
+                .flatMap(bookRepository::delete);
     }
 
 

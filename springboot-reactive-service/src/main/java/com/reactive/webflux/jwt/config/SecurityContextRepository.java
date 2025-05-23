@@ -5,11 +5,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.*;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 
 @Component
 public class SecurityContextRepository implements ServerSecurityContextRepository {
@@ -18,7 +20,7 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
     private JwtUtil jwtUtil;
 
     @Autowired
-    private AuthenticationManager authenticationManager;
+    private ReactiveUserDetailsService userDetailsService;
 
     @Override
     public Mono<SecurityContext> load(ServerWebExchange exchange) {
@@ -28,8 +30,10 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
             String token = authHeader.substring(7);
             if (jwtUtil.isTokenValid(token)) {
                 String username = jwtUtil.getUsername(token);
-                Authentication auth = new UsernamePasswordAuthenticationToken(username, token);
-                return authenticationManager.authenticate(auth).map(SecurityContextImpl::new);
+                Authentication auth = new UsernamePasswordAuthenticationToken(username, null);
+                return new JwtReactiveAuthenticationManager(jwtUtil, userDetailsService)
+                        .authenticate(auth)
+                        .map(SecurityContextImpl::new);
             }
         }
 
@@ -38,7 +42,6 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
 
     @Override
     public Mono<Void> save(ServerWebExchange exchange, SecurityContext context) {
-        return Mono.empty(); // stateless
+        return Mono.empty(); // Stateless
     }
 }
-

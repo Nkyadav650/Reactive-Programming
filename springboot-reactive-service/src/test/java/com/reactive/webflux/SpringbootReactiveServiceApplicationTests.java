@@ -3,6 +3,8 @@ package com.reactive.webflux;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.concurrent.ConcurrentHashMap;
 //import reactor.core.publisher.Flux;
 //import reactor.core.publisher.Mono;
 //
@@ -18,6 +20,14 @@ class SpringbootReactiveServiceApplicationTests {
 
 	@Test
 	void contextLoads() {
+//		ConcurrentHashMap<String,Integer> map= new ConcurrentHashMap<>();
+//		map.put("A",1);
+//		map.put("B",2);
+//		map.put("C",3);
+//		map.put("D",4);
+//		System.out.println(map.get("B"));
+//		System.out.println(map.putIfAbsent("E",100));
+//		map.forEach((k,v)-> System.out.println(k+" : "+v));
 //		Mono<?> monoString= Mono.just("eidiko")
 //				.then(Mono.error(new RuntimeException("Exception occured")))
 //				.log();
